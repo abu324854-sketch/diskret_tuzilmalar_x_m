@@ -1,112 +1,1111 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="uz" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O'qituvchi Kabineti | Ekotizim</title>
+    <title>Ijtimoiy Tarmoq Graflari - Eng Qisqa Yo'l Analizatori</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        /* Glassmorphism custom styles */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(71, 85, 105, 1);
+        }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col overflow-x-hidden selection:bg-cyan-500 selection:text-white">
 
-    <div class="max-w-4xl mx-auto p-6">
-        <!-- Header -->
-        <header class="bg-white shadow-md rounded-xl p-6 mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">👨‍🏫 O'qituvchi Kabineti</h1>
-            <p class="text-gray-600">Guruhlarga mustaqil ish berish va talabalar natijalarini tekshirish.</p>
-        </header>
-
-        <!-- Guruhni tanlash -->
-        <div class="bg-white shadow-md rounded-xl p-6 mb-6">
-            <label class="block text-gray-700 font-semibold mb-2">O'qitish guruhini tanlang:</label>
-            <select id="groupSelect" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="renderStudents()">
-                <option value="F-KI-101-25">F-KI-101-25</option>
-                <option value="F-KI-102-25">F-KI-102-25</option>
-            </select>
-        </div>
-
-        <!-- Talabalar ro'yxati -->
-        <div class="bg-white shadow-md rounded-xl p-6 mb-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">👥 Talabalar ro'yxati va ishlari</h2>
-            <div id="studentList" class="divide-y divide-gray-200">
-                <!-- JavaScript orqali to'ldiriladi -->
+    <!-- Header / Navbar -->
+    <header class="glass-panel sticky top-0 z-40 border-b border-slate-800/80 px-6 py-3.5 flex items-center justify-between shadow-2xl">
+        <div class="flex items-center space-x-3">
+            <div class="p-2.5 bg-gradient-to-tr from-cyan-600 to-blue-600 rounded-xl shadow-lg shadow-cyan-500/20 text-white flex items-center justify-center">
+                <i data-lucide="share-2" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-white via-slate-200 to-cyan-400 bg-clip-text text-transparent">
+                    SocialGraph PathFinder Pro
+                </h1>
+                <p class="text-xs text-slate-400 font-medium">Ijtimoiy tarmoqlar grafi va algoritmik tahlil platformasi</p>
             </div>
         </div>
 
-        <!-- Yangi topshiriq berish -->
-        <div class="bg-white shadow-md rounded-xl p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">📝 Guruhga Yangi Mustaqil Ish Berish</h2>
-            <div class="mb-4">
-                <label class="block text-gray-700 font-semibold mb-2">Topshiriq mavzusi:</label>
-                <input type="text" id="taskTitle" placeholder="Masalan: Web dasturlash asoslari mustaqil ishi" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="flex items-center space-x-3">
+            <!-- Preset Samples -->
+            <div class="relative group">
+                <button class="flex items-center space-x-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 transition-all">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i>
+                    <span>Tayyor Shablonlar</span>
+                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+                <div class="absolute right-0 mt-2 w-56 glass-panel rounded-xl shadow-2xl border border-slate-700/60 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 z-50 p-1.5">
+                    <button onclick="loadTemplate('small')" class="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-800/80 transition-colors flex items-center space-x-2">
+                        <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        <span>Kichik do'stlar tarmog'i (5 foydalanuvchi)</span>
+                    </button>
+                    <button onclick="loadTemplate('social')" class="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-800/80 transition-colors flex items-center space-x-2">
+                        <i data-lucide="network" class="w-3.5 h-3.5 text-cyan-400"></i>
+                        <span>Kengaytirilgan tarmoq (8 foydalanuvchi)</span>
+                    </button>
+                    <button onclick="loadTemplate('complex')" class="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-800/80 transition-colors flex items-center space-x-2">
+                        <i data-lucide="globe" class="w-3.5 h-3.5 text-purple-400"></i>
+                        <span>Murakkab hamjamiyat (12 foydalanuvchi)</span>
+                    </button>
+                </div>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 font-semibold mb-2">Topshirish muddati:</label>
-                <input type="date" id="taskDeadline" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+            <!-- Clear Canvas -->
+            <button onclick="clearGraph()" class="flex items-center space-x-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                <span>Tozalash</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-[1800px] mx-auto w-full">
+
+        <!-- Left Control Sidebar -->
+        <aside class="lg:col-span-3 space-y-5 flex flex-col">
+            <!-- Mode Switcher -->
+            <div class="glass-panel p-4 rounded-2xl border border-slate-800">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center space-x-2">
+                    <i data-lucide="mouse-pointer" class="w-4 h-4 text-cyan-400"></i>
+                    <span>Tahrirlash Rejimi</span>
+                </h3>
+                <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-900/80 rounded-xl border border-slate-800">
+                    <button id="mode-select" onclick="setMode('select')" class="flex flex-col items-center justify-center py-2 px-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+                        <i data-lucide="move" class="w-4 h-4 mb-1"></i>
+                        <span>Ko'chirish</span>
+                    </button>
+                    <button id="mode-node" onclick="setMode('node')" class="flex flex-col items-center justify-center py-2 px-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+                        <i data-lucide="user-plus" class="w-4 h-4 mb-1"></i>
+                        <span>+ Foydalanuvchi</span>
+                    </button>
+                    <button id="mode-edge" onclick="setMode('edge')" class="flex flex-col items-center justify-center py-2 px-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+                        <i data-lucide="link-2" class="w-4 h-4 mb-1"></i>
+                        <span>+ Aloqa</span>
+                    </button>
+                </div>
             </div>
-            <button onclick="assignTask()" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition">Topshiriqni yuborish</button>
-            <p id="successMsg" class="text-green-600 mt-3 hidden">Topshiriq guruhga muvaffaqiyatli yuborildi!</p>
+
+            <!-- Pathfinding Panel -->
+            <div class="glass-panel p-4 rounded-2xl border border-slate-800 flex-1 flex flex-col justify-between">
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-2">
+                        <i data-lucide="navigation" class="w-4 h-4 text-cyan-400"></i>
+                        <span>Eng Qisqa Yo'l Qidirish</span>
+                    </h3>
+
+                    <!-- Algorithm Selection -->
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5 font-medium">Algoritm Tanlang:</label>
+                        <select id="algorithm-select" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs font-medium text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors">
+                            <option value="dijkstra">Dijkstra Algoritmi (Bitta manbadan eng qisqa yo'l)</option>
+                            <option value="floyd">Floyd-Warshall Algoritmi (Barcha juftliklar)</option>
+                        </select>
+                    </div>
+
+                    <!-- Graph Direction Switch -->
+                    <div class="flex items-center justify-between p-2.5 bg-slate-900/60 rounded-xl border border-slate-800">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="arrow-right-left" class="w-4 h-4 text-cyan-400"></i>
+                            <span class="text-xs font-medium text-slate-300">Yo'naltirilgan Graf</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="directed-toggle" onchange="toggleDirected()" class="sr-only peer">
+                            <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-600"></div>
+                        </label>
+                    </div>
+
+                    <!-- Start Node -->
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5 font-medium">Boshlang'ich Foydalanuvchi (A):</label>
+                        <select id="start-node" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs font-medium text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors">
+                            <!-- Options dynamically populated -->
+                        </select>
+                    </div>
+
+                    <!-- End Node -->
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5 font-medium">Mo'ljallangan Foydalanuvchi (B):</label>
+                        <select id="end-node" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs font-medium text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors">
+                            <!-- Options dynamically populated -->
+                        </select>
+                    </div>
+
+                    <!-- Speed Controller -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs text-slate-400 font-medium">Animatsiya Tezligi:</label>
+                            <span id="speed-val" class="text-xs text-cyan-400 font-semibold">1.0x</span>
+                        </div>
+                        <input type="range" id="speed-slider" min="0.2" max="3" step="0.1" value="1" oninput="updateSpeedDisplay(this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500">
+                    </div>
+                </div>
+
+                <div class="pt-4 space-y-2">
+                    <button onclick="runPathfindingAnimation()" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold py-2.5 px-4 rounded-xl shadow-lg shadow-cyan-500/25 flex items-center justify-center space-x-2 text-xs transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                        <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                        <span>Yo'lni Hisoblash va Ko'rsatish</span>
+                    </button>
+                    <button onclick="resetPathHighlight()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2 px-4 rounded-xl border border-slate-700/60 flex items-center justify-center space-x-2 text-xs transition-all">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Natijani Tozalash</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center Graph Visualizer -->
+        <section class="lg:col-span-6 flex flex-col space-y-4">
+            <div class="glass-panel p-4 rounded-2xl border border-slate-800 flex-1 flex flex-col min-h-[500px] relative overflow-hidden">
+                <!-- Toolbar overlay -->
+                <div class="absolute top-6 left-6 z-10 flex items-center space-x-2 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 shadow-lg">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="graph-status" class="text-xs font-semibold text-slate-300">Interaktiv Tahrirlash Rejimi</span>
+                </div>
+
+                <div class="absolute top-6 right-6 z-10 flex items-center space-x-2">
+                    <button onclick="zoomCanvas(1.1)" class="p-2 bg-slate-900/90 hover:bg-slate-800 border border-slate-800 rounded-xl text-slate-300 transition-colors shadow-lg" title="Yaqinlashtirish">
+                        <i data-lucide="zoom-in" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="zoomCanvas(0.9)" class="p-2 bg-slate-900/90 hover:bg-slate-800 border border-slate-800 rounded-xl text-slate-300 transition-colors shadow-lg" title="Uzoqlashtirish">
+                        <i data-lucide="zoom-out" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="resetZoom()" class="p-2 bg-slate-900/90 hover:bg-slate-800 border border-slate-800 rounded-xl text-slate-300 transition-colors shadow-lg" title="O'lchamni Tiklash">
+                        <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Canvas Container -->
+                <div class="flex-1 relative w-full h-full min-h-[450px] bg-slate-950/50 rounded-xl overflow-hidden border border-slate-900" id="canvas-container">
+                    <canvas id="graphCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+                </div>
+
+                <!-- Footer Canvas Instructions -->
+                <div class="mt-3 flex items-center justify-between text-[11px] text-slate-400 px-1">
+                    <span class="flex items-center space-x-1">
+                        <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-400"></i>
+                        <span>Tugun yaratish uchun ekranga bosing, ulash uchun tugunlarni ketma-ket tanlang.</span>
+                    </span>
+                    <span id="node-edge-count" class="font-mono text-slate-400">0 Tugun | 0 Aloqa</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Output / Analytics Panel -->
+        <aside class="lg:col-span-3 space-y-5 flex flex-col">
+            <!-- Path Results Box -->
+            <div class="glass-panel p-4 rounded-2xl border border-slate-800">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center space-x-2">
+                    <i data-lucide="route" class="w-4 h-4 text-cyan-400"></i>
+                    <span>Natijalar va Qadamlar</span>
+                </h3>
+
+                <div id="path-results-box" class="space-y-3">
+                    <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-center">
+                        <p class="text-xs text-slate-400">Eng qisqa yo'lni ko'rish uchun <br><span class="text-cyan-400 font-semibold">"Yo'lni Hisoblash"</span> tugmasini bosing.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Network Metrics -->
+            <div class="glass-panel p-4 rounded-2xl border border-slate-800 flex-1 flex flex-col">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center space-x-2">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4 text-cyan-400"></i>
+                    <span>Ijtimoiy Tarmoq Metriklari</span>
+                </h3>
+
+                <div class="space-y-2.5 text-xs flex-1">
+                    <div class="flex justify-between items-center p-2.5 bg-slate-900/60 rounded-xl border border-slate-800/80">
+                        <span class="text-slate-400">Markaziylik Darajasi (Degree):</span>
+                        <span id="metric-max-degree" class="font-bold text-slate-200">-</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-900/60 rounded-xl border border-slate-800/80">
+                        <span class="text-slate-400">Graf Zichligi (Density):</span>
+                        <span id="metric-density" class="font-bold text-slate-200">-</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-900/60 rounded-xl border border-slate-800/80">
+                        <span class="text-slate-400">O'rtacha Aloqa Oralig'i:</span>
+                        <span id="metric-avg-path" class="font-bold text-slate-200">-</span>
+                    </div>
+
+                    <!-- Floyd Matrix Modal Trigger -->
+                    <div class="pt-2">
+                        <button onclick="openFloydMatrixModal()" class="w-full bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 py-2 px-3 rounded-xl text-xs font-semibold text-cyan-400 flex items-center justify-center space-x-2 transition-all">
+                            <i data-lucide="grid" class="w-4 h-4"></i>
+                            <span>Floyd-Warshall Masofalar Matritsasi</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Modal for Floyd-Warshall Matrix -->
+    <div id="matrix-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel max-w-3xl w-full rounded-2xl border border-slate-800 p-6 flex flex-col max-h-[85vh]">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="grid" class="w-5 h-5 text-cyan-400"></i>
+                    <h3 class="font-bold text-base text-slate-100">Floyd-Warshall Masofalar Matritsasi</h3>
+                </div>
+                <button onclick="closeFloydMatrixModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-auto py-4">
+                <div id="matrix-container" class="overflow-x-auto">
+                    <!-- Matrix Table rendered dynamically -->
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 flex justify-end">
+                <button onclick="closeFloydMatrixModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2 rounded-xl transition-all">
+                    Yopish
+                </button>
+            </div>
         </div>
     </div>
 
+    <!-- JavaScript Application Logic -->
     <script>
-        // Simulyatsiya qilingan baza
-        const studentsData = [
-            { id: 1, name: "Alisherov B.", group: "F-KI-101-25", status: "Topshirilmagan" },
-            { id: 2, name: "Karimova Z.", group: "F-KI-101-25", status: "Topshirilgan" },
-            { id: 3, name: "Tohirov M.", group: "F-KI-102-25", status: "Topshirilmagan" }
-        ];
+        // Graph Data Model
+        let nodes = [];
+        let edges = [];
+        let isDirected = false;
 
-        function renderStudents() {
-            const selectedGroup = document.getElementById('groupSelect').value;
-            const container = document.getElementById('studentList');
-            container.innerHTML = '';
+        // Interactive Canvas State
+        let mode = 'select'; // 'select', 'node', 'edge'
+        let selectedNode = null;
+        let edgeStartNode = null;
+        let draggedNode = null;
+        let scale = 1;
+        let panX = 0, panY = 0;
 
-            const filtered = studentsData.filter(s => s.group === selectedGroup);
+        // Pathfinding Animation State
+        let activePath = [];
+        let activeVisitedNodes = new Set();
+        let activeExaminedEdges = [];
+        let animationTimer = null;
 
-            if (filtered.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 py-3">Bu guruhda talabalar yo\'q.</p>';
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Node Names Pool
+        const namePool = ["Anvar", "Barchin", "Diyor", "Eldor", "Feruza", "Gulnoza", "Hasan", "Iroda", "Jasur", "Kamola", "Lola", "Malika", "Nodir", "Olim", "Parvina", "Rostam", "Sardor", "Tohir", "Umid", "Zilola"];
+
+        // Initialize Canvas Size
+        function resizeCanvas() {
+            const container = document.getElementById('canvas-container');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            drawGraph();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // App Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            resizeCanvas();
+            loadTemplate('social');
+            setMode('select');
+        });
+
+        // Mode Switcher
+        function setMode(m) {
+            mode = m;
+            document.querySelectorAll('#mode-select, #mode-node, #mode-edge').forEach(btn => {
+                btn.classList.remove('bg-cyan-600', 'text-white', 'shadow-lg');
+                btn.classList.add('text-slate-400');
+            });
+
+            const activeBtn = document.getElementById(`mode-${m}`);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-cyan-600', 'text-white', 'shadow-lg');
+                activeBtn.classList.remove('text-slate-400');
+            }
+
+            const statusText = {
+                'select': 'Interaktiv Tahrirlash (Tugunlarni ko\'chirish)',
+                'node': 'Yangi Foydalanuvchi Qo\'shish Режими',
+                'edge': 'Do\'stlik Aloqasini Yaratish Режими'
+            };
+            document.getElementById('graph-status').innerText = statusText[m];
+            edgeStartNode = null;
+            drawGraph();
+        }
+
+        function toggleDirected() {
+            isDirected = document.getElementById('directed-toggle').checked;
+            calculateMetrics();
+            drawGraph();
+        }
+
+        // Canvas Zoom Controls
+        function zoomCanvas(factor) {
+            scale *= factor;
+            scale = Math.max(0.4, Math.min(scale, 2.5));
+            drawGraph();
+        }
+
+        function resetZoom() {
+            scale = 1;
+            panX = 0;
+            panY = 0;
+            drawGraph();
+        }
+
+        // Template Loader
+        function loadTemplate(type) {
+            nodes = [];
+            edges = [];
+            resetPathHighlight();
+
+            const width = canvas.width || 600;
+            const height = canvas.height || 400;
+            const cx = width / 2;
+            const cy = height / 2;
+
+            if (type === 'small') {
+                nodes = [
+                    { id: 1, name: "Anvar", x: cx - 180, y: cy },
+                    { id: 2, name: "Barchin", x: cx - 60, y: cy - 120 },
+                    { id: 3, name: "Diyor", x: cx - 60, y: cy + 120 },
+                    { id: 4, name: "Eldor", x: cx + 80, y: cy - 60 },
+                    { id: 5, name: "Feruza", x: cx + 180, y: cy + 60 }
+                ];
+                edges = [
+                    { from: 1, to: 2, weight: 2 },
+                    { from: 1, to: 3, weight: 4 },
+                    { from: 2, to: 3, weight: 1 },
+                    { from: 2, to: 4, weight: 7 },
+                    { from: 3, to: 5, weight: 3 },
+                    { from: 4, to: 5, weight: 1 }
+                ];
+            } else if (type === 'social') {
+                nodes = [
+                    { id: 1, name: "Anvar", x: cx - 220, y: cy - 40 },
+                    { id: 2, name: "Barchin", x: cx - 120, y: cy - 140 },
+                    { id: 3, name: "Diyor", x: cx - 100, y: cy + 110 },
+                    { id: 4, name: "Eldor", x: cx + 20, y: cy - 120 },
+                    { id: 5, name: "Feruza", x: cx + 40, y: cy + 40 },
+                    { id: 6, name: "Gulnoza", x: cx + 180, y: cy - 100 },
+                    { id: 7, name: "Hasan", x: cx + 200, y: cy + 100 },
+                    { id: 8, name: "Jasur", x: cx + 300, y: cy - 10 }
+                ];
+                edges = [
+                    { from: 1, to: 2, weight: 3 },
+                    { from: 1, to: 3, weight: 5 },
+                    { from: 2, to: 4, weight: 2 },
+                    { from: 3, to: 5, weight: 4 },
+                    { from: 4, to: 5, weight: 1 },
+                    { from: 4, to: 6, weight: 6 },
+                    { from: 5, to: 7, weight: 2 },
+                    { from: 6, to: 8, weight: 3 },
+                    { from: 7, to: 8, weight: 2 },
+                    { from: 5, to: 6, weight: 3 }
+                ];
+            } else if (type === 'complex') {
+                const count = 12;
+                const radius = Math.min(width, height) * 0.35;
+                for (let i = 0; i < count; i++) {
+                    const angle = (i * 2 * Math.PI) / count;
+                    nodes.push({
+                        id: i + 1,
+                        name: namePool[i % namePool.length],
+                        x: cx + radius * Math.cos(angle),
+                        y: cy + radius * Math.sin(angle)
+                    });
+                }
+                for (let i = 0; i < count; i++) {
+                    const next = (i + 1) % count;
+                    const jump = (i + 3) % count;
+                    const w1 = Math.floor(Math.random() * 8) + 1;
+                    const w2 = Math.floor(Math.random() * 8) + 1;
+                    edges.push({ from: nodes[i].id, to: nodes[next].id, weight: w1 });
+                    if (i % 2 === 0) {
+                        edges.push({ from: nodes[i].id, to: nodes[jump].id, weight: w2 });
+                    }
+                }
+            }
+
+            updateSelectDropdowns();
+            calculateMetrics();
+            drawGraph();
+        }
+
+        function clearGraph() {
+            nodes = [];
+            edges = [];
+            resetPathHighlight();
+            updateSelectDropdowns();
+            calculateMetrics();
+            drawGraph();
+        }
+
+        // Update Dropdowns
+        function updateSelectDropdowns() {
+            const startSelect = document.getElementById('start-node');
+            const endSelect = document.getElementById('end-node');
+
+            const prevStart = startSelect.value;
+            const prevEnd = endSelect.value;
+
+            startSelect.innerHTML = '';
+            endSelect.innerHTML = '';
+
+            nodes.forEach(node => {
+                const opt1 = document.createElement('option');
+                opt1.value = node.id;
+                opt1.innerText = `${node.name} (#${node.id})`;
+                startSelect.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = node.id;
+                opt2.innerText = `${node.name} (#${node.id})`;
+                endSelect.appendChild(opt2);
+            });
+
+            if (nodes.length > 0) {
+                startSelect.value = prevStart && nodes.some(n => n.id == prevStart) ? prevStart : nodes[0].id;
+                endSelect.value = prevEnd && nodes.some(n => n.id == prevEnd) ? prevEnd : nodes[nodes.length - 1].id;
+            }
+
+            document.getElementById('node-edge-count').innerText = `${nodes.length} Foydalanuvchi | ${edges.length} Aloqa`;
+        }
+
+        // Canvas Drawing Engine
+        function drawGraph() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(panX, panY);
+            ctx.scale(scale, scale);
+
+            // Draw Edges
+            edges.forEach(edge => {
+                const fromNode = nodes.find(n => n.id === edge.from);
+                const toNode = nodes.find(n => n.id === edge.to);
+                if (!fromNode || !toNode) return;
+
+                const isPathEdge = isEdgeInPath(edge.from, edge.to);
+                const isExamined = activeExaminedEdges.some(e => (e.from === edge.from && e.to === edge.to) || (!isDirected && e.from === edge.to && e.to === edge.from));
+
+                ctx.beginPath();
+                ctx.moveTo(fromNode.x, fromNode.y);
+                ctx.lineTo(toNode.x, toNode.y);
+
+                if (isPathEdge) {
+                    ctx.strokeStyle = '#06b6d4'; // Cyan highlight
+                    ctx.lineWidth = 4;
+                } else if (isExamined) {
+                    ctx.strokeStyle = '#f59e0b'; // Amber warning color
+                    ctx.lineWidth = 3;
+                } else {
+                    ctx.strokeStyle = 'rgba(71, 85, 105, 0.5)';
+                    ctx.lineWidth = 2;
+                }
+                ctx.stroke();
+
+                // Direction Arrow if Directed
+                if (isDirected) {
+                    drawArrowhead(ctx, fromNode.x, fromNode.y, toNode.x, toNode.y, 22, isPathEdge ? '#06b6d4' : '#64748b');
+                }
+
+                // Edge Weight Label
+                const midX = (fromNode.x + toNode.x) / 2;
+                const midY = (fromNode.y + toNode.y) / 2;
+
+                ctx.font = '600 11px "Plus Jakarta Sans"';
+                const text = `${edge.weight} og'irlat`;
+                const textWidth = ctx.measureText(text).width;
+
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.roundRect(midX - textWidth / 2 - 4, midY - 9, textWidth + 8, 18, 6);
+                ctx.fill();
+                ctx.strokeStyle = isPathEdge ? '#06b6d4' : 'rgba(148, 163, 184, 0.2)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                ctx.fillStyle = isPathEdge ? '#38bdf8' : '#94a3b8';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(edge.weight, midX, midY);
+            });
+
+            // Drawing Line while adding edge
+            if (mode === 'edge' && edgeStartNode) {
+                ctx.beginPath();
+                ctx.moveTo(edgeStartNode.x, edgeStartNode.y);
+                ctx.lineTo(mousePos.x, mousePos.y);
+                ctx.strokeStyle = '#06b6d4';
+                ctx.setLineDash([4, 4]);
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // Draw Nodes
+            nodes.forEach(node => {
+                const isVisited = activeVisitedNodes.has(node.id);
+                const isInPath = activePath.includes(node.id);
+                const isSelected = selectedNode && selectedNode.id === node.id;
+                const isEdgeSource = edgeStartNode && edgeStartNode.id === node.id;
+
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 22, 0, 2 * Math.PI);
+
+                // Node Fill Styling
+                if (isInPath) {
+                    ctx.fillStyle = '#0284c7'; // Active path node
+                } else if (isVisited) {
+                    ctx.fillStyle = '#1e3a8a'; // Visited node
+                } else if (isSelected || isEdgeSource) {
+                    ctx.fillStyle = '#0d9488'; // Selected node
+                } else {
+                    ctx.fillStyle = '#1e293b'; // Default dark node
+                }
+                ctx.fill();
+
+                // Node Border
+                ctx.lineWidth = (isInPath || isSelected || isEdgeSource) ? 3 : 2;
+                ctx.strokeStyle = isInPath ? '#38bdf8' : (isSelected || isEdgeSource) ? '#2dd4bf' : '#475569';
+                ctx.stroke();
+
+                // Node Label (User Name)
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = '600 12px "Plus Jakarta Sans"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node.name, node.x, node.y);
+            });
+
+            ctx.restore();
+        }
+
+        function drawArrowhead(context, fromx, fromy, tox, toy, radius, color) {
+            const x_center = tox;
+            const y_center = toy;
+            let angle = Math.atan2(toy - fromy, tox - fromx);
+
+            const x = x_center - radius * Math.cos(angle);
+            const y = y_center - radius * Math.sin(angle);
+
+            context.save();
+            context.beginPath();
+            context.fillStyle = color;
+            context.moveTo(x, y);
+            context.lineTo(x - 10 * Math.cos(angle - Math.PI / 6), y - 10 * Math.sin(angle - Math.PI / 6));
+            context.lineTo(x - 10 * Math.cos(angle + Math.PI / 6), y - 10 * Math.sin(angle + Math.PI / 6));
+            context.closePath();
+            context.fill();
+            context.restore();
+        }
+
+        function isEdgeInPath(u, v) {
+            if (activePath.length < 2) return false;
+            for (let i = 0; i < activePath.length - 1; i++) {
+                if (isDirected) {
+                    if (activePath[i] === u && activePath[i + 1] === v) return true;
+                } else {
+                    if ((activePath[i] === u && activePath[i + 1] === v) || (activePath[i] === v && activePath[i + 1] === u)) return true;
+                }
+            }
+            return false;
+        }
+
+        // Mouse & Canvas Events
+        let mousePos = { x: 0, y: 0 };
+        let isMouseDown = false;
+
+        function getCanvasCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (e.clientX - rect.left - panX) / scale,
+                y: (e.clientY - rect.top - panY) / scale
+            };
+        }
+
+        function getNodeAtPos(pos) {
+            return nodes.find(n => Math.hypot(n.x - pos.x, n.y - pos.y) <= 24);
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            const pos = getCanvasCoordinates(e);
+            const clickedNode = getNodeAtPos(pos);
+            isMouseDown = true;
+
+            if (mode === 'select') {
+                if (clickedNode) {
+                    selectedNode = clickedNode;
+                    draggedNode = clickedNode;
+                } else {
+                    selectedNode = null;
+                }
+            } else if (mode === 'node') {
+                if (!clickedNode) {
+                    const newId = nodes.length > 0 ? Math.max(...nodes.map(n => n.id)) + 1 : 1;
+                    const nameIndex = (newId - 1) % namePool.length;
+                    nodes.push({
+                        id: newId,
+                        name: `${namePool[nameIndex]}`,
+                        x: pos.x,
+                        y: pos.y
+                    });
+                    updateSelectDropdowns();
+                    calculateMetrics();
+                }
+            } else if (mode === 'edge') {
+                if (clickedNode) {
+                    if (!edgeStartNode) {
+                        edgeStartNode = clickedNode;
+                    } else if (edgeStartNode.id !== clickedNode.id) {
+                        const weightStr = prompt("Aloqa vazni (masofasi/og'irligi) kiriting:", "1");
+                        const weight = parseInt(weightStr, 10);
+                        if (!isNaN(weight) && weight > 0) {
+                            // Replace existing edge or add new
+                            edges = edges.filter(e => !(e.from === edgeStartNode.id && e.to === clickedNode.id));
+                            edges.push({ from: edgeStartNode.id, to: clickedNode.id, weight: weight });
+                            calculateMetrics();
+                        }
+                        edgeStartNode = null;
+                    }
+                } else {
+                    edgeStartNode = null;
+                }
+            }
+            drawGraph();
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            mousePos = getCanvasCoordinates(e);
+
+            if (isMouseDown && draggedNode && mode === 'select') {
+                draggedNode.x = mousePos.x;
+                draggedNode.y = mousePos.y;
+            }
+            drawGraph();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isMouseDown = false;
+            draggedNode = null;
+        });
+
+        // Speed Display logic
+        function updateSpeedDisplay(val) {
+            document.getElementById('speed-val').innerText = `${parseFloat(val).toFixed(1)}x`;
+        }
+
+        // Dijkstra's Algorithm Implementation
+        function runDijkstra(startId, endId) {
+            const dist = {};
+            const prev = {};
+            const visited = new Set();
+            const steps = [];
+
+            nodes.forEach(n => {
+                dist[n.id] = Infinity;
+                prev[n.id] = null;
+            });
+            dist[startId] = 0;
+
+            let unvisited = [...nodes];
+
+            while (unvisited.length > 0) {
+                unvisited.sort((a, b) => dist[a.id] - dist[b.id]);
+                const u = unvisited.shift();
+
+                if (dist[u.id] === Infinity) break;
+
+                visited.add(u.id);
+                steps.push({
+                    type: 'visit',
+                    nodeId: u.id,
+                    currentDist: dist[u.id]
+                });
+
+                if (u.id == endId) break;
+
+                // Find neighbors
+                const neighbors = edges.filter(e => e.from === u.id || (!isDirected && e.to === u.id));
+
+                for (let edge of neighbors) {
+                    const neighborId = (edge.from === u.id) ? edge.to : edge.from;
+                    if (!visited.has(neighborId)) {
+                        const alt = dist[u.id] + edge.weight;
+                        steps.push({
+                            type: 'examine',
+                            from: u.id,
+                            to: neighborId,
+                            weight: edge.weight
+                        });
+
+                        if (alt < dist[neighborId]) {
+                            dist[neighborId] = alt;
+                            prev[neighborId] = u.id;
+                            steps.push({
+                                type: 'update',
+                                nodeId: neighborId,
+                                newDist: alt,
+                                prevNode: u.id
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Reconstruct path
+            const path = [];
+            let curr = parseInt(endId, 10);
+            if (dist[curr] !== Infinity) {
+                while (curr !== null) {
+                    path.unshift(curr);
+                    curr = prev[curr];
+                }
+            }
+
+            return { path, distance: dist[endId], steps };
+        }
+
+        // Floyd-Warshall Algorithm Implementation
+        function runFloydWarshall() {
+            const n = nodes.length;
+            const dist = {};
+            const next = {};
+
+            nodes.forEach(u => {
+                dist[u.id] = {};
+                next[u.id] = {};
+                nodes.forEach(v => {
+                    if (u.id === v.id) {
+                        dist[u.id][v.id] = 0;
+                        next[u.id][v.id] = null;
+                    } else {
+                        dist[u.id][v.id] = Infinity;
+                        next[u.id][v.id] = null;
+                    }
+                });
+            });
+
+            edges.forEach(e => {
+                dist[e.from][e.to] = e.weight;
+                next[e.from][e.to] = e.to;
+                if (!isDirected) {
+                    dist[e.to][e.from] = e.weight;
+                    next[e.to][e.from] = e.from;
+                }
+            });
+
+            nodes.forEach(k => {
+                nodes.forEach(i => {
+                    nodes.forEach(j => {
+                        if (dist[i.id][k.id] !== Infinity && dist[k.id][j.id] !== Infinity) {
+                            if (dist[i.id][k.id] + dist[k.id][j.id] < dist[i.id][j.id]) {
+                                dist[i.id][j.id] = dist[i.id][k.id] + dist[k.id][j.id];
+                                next[i.id][j.id] = next[i.id][k.id];
+                            }
+                        }
+                    });
+                });
+            });
+
+            return { dist, next };
+        }
+
+        function reconstructFloydPath(startId, endId, next) {
+            if (next[startId][endId] === null) return [];
+            const path = [parseInt(startId, 10)];
+            let curr = parseInt(startId, 10);
+            while (curr !== parseInt(endId, 10)) {
+                curr = next[curr][endId];
+                if (curr === null) return [];
+                path.push(curr);
+            }
+            return path;
+        }
+
+        // Animated Pathfinding Execution
+        function runPathfindingAnimation() {
+            resetPathHighlight();
+
+            const startId = parseInt(document.getElementById('start-node').value, 10);
+            const endId = parseInt(document.getElementById('end-node').value, 10);
+            const algorithm = document.getElementById('algorithm-select').value;
+            const speedMultiplier = parseFloat(document.getElementById('speed-slider').value);
+
+            if (!startId || !endId) {
+                alert("Iltimos, boshlang'ich va oxirgi foydalanuvchini tanlang!");
                 return;
             }
 
-            filtered.forEach(student => {
-                const row = document.createElement('div');
-                row.className = 'py-3 flex justify-between items-center';
-                row.innerHTML = `
-                    <div>
-                        <span class="font-medium text-gray-800">${student.name}</span>
-                        <span class="ml-4 text-sm px-2 py-1 rounded ${student.status === 'Topshirilgan' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${student.status}</span>
-                    </div>
-                    <button onclick="evaluateStudent(${student.id})" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition">Baholash</button>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        function evaluateStudent(id) {
-            const student = studentsData.find(s => s.id === id);
-            if (student) {
-                student.status = "Baholandi";
-                alert(`${student.name} ning ishi qabul qilindi va baho qo'yildi!`);
-                renderStudents();
+            if (startId === endId) {
+                alert("Boshlang'ich va oxirgi foydalanuvchi bir xil bo'lishi mumkin emas!");
+                return;
             }
-        }
 
-        function assignTask() {
-            const title = document.getElementById('taskTitle').value;
-            const deadline = document.getElementById('taskDeadline').value;
-            if (title && deadline) {
-                const msg = document.getElementById('successMsg');
-                msg.classList.remove('hidden');
-                setTimeout(() => msg.classList.add('hidden'), 3000);
-                document.getElementById('taskTitle').value = '';
+            let resultPath = [];
+            let totalDist = Infinity;
+            let animationSteps = [];
+
+            if (algorithm === 'dijkstra') {
+                const res = runDijkstra(startId, endId);
+                resultPath = res.path;
+                totalDist = res.distance;
+                animationSteps = res.steps;
             } else {
-                alert("Iltimos, barcha maydonlarni to'ldiring!");
+                const { dist, next } = runFloydWarshall();
+                resultPath = reconstructFloydPath(startId, endId, next);
+                totalDist = dist[startId][endId];
+                // Generate simplified visual steps for Floyd
+                animationSteps = resultPath.map(nodeId => ({ type: 'visit', nodeId }));
             }
+
+            // Step-by-step visual player
+            let stepIndex = 0;
+            const stepDelay = 600 / speedMultiplier;
+
+            function playNextStep() {
+                if (stepIndex >= animationSteps.length) {
+                    activePath = resultPath;
+                    drawGraph();
+                    renderResultsBox(resultPath, totalDist);
+                    return;
+                }
+
+                const step = animationSteps[stepIndex];
+                if (step.type === 'visit') {
+                    activeVisitedNodes.add(step.nodeId);
+                } else if (step.type === 'examine') {
+                    activeExaminedEdges.push({ from: step.from, to: step.to });
+                }
+
+                drawGraph();
+                stepIndex++;
+                animationTimer = setTimeout(playNextStep, stepDelay);
+            }
+
+            playNextStep();
         }
 
-        // Boshlang'ich yuklash
-        renderStudents();
+        function resetPathHighlight() {
+            if (animationTimer) clearTimeout(animationTimer);
+            activePath = [];
+            activeVisitedNodes.clear();
+            activeExaminedEdges = [];
+            drawGraph();
+
+            document.getElementById('path-results-box').innerHTML = `
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-center">
+                    <p class="text-xs text-slate-400">Eng qisqa yo'lni ko'rish uchun <br><span class="text-cyan-400 font-semibold">"Yo'lni Hisoblash"</span> tugmasini bosing.</p>
+                </div>
+            `;
+        }
+
+        // Render Results Panel Output
+        function renderResultsBox(path, distance) {
+            const container = document.getElementById('path-results-box');
+
+            if (path.length === 0 || distance === Infinity) {
+                container.innerHTML = `
+                    <div class="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-center">
+                        <i data-lucide="alert-circle" class="w-5 h-5 text-red-400 mx-auto mb-1"></i>
+                        <p class="text-xs font-semibold text-red-300">Aloqa mavjud emas!</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Ushbu foydalanuvchilar o'rtasida bog'liqlik yo'li topilmadi.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            const pathNames = path.map(id => {
+                const node = nodes.find(n => n.id === id);
+                return node ? node.name : `#${id}`;
+            });
+
+            const degreesOfSeparation = path.length - 1;
+
+            container.innerHTML = `
+                <div class="p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Umumiy Masofa / Vazn:</span>
+                        <span class="font-bold text-cyan-400 text-sm">${distance} birlik</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Aloqa Darajasi (Orasidagi do'stlar):</span>
+                        <span class="font-bold text-slate-200">${degreesOfSeparation} qadam</span>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Eng Optimal Zanjir:</label>
+                    <div class="flex flex-wrap items-center gap-1.5 p-2.5 bg-slate-900/80 rounded-xl border border-slate-800 text-xs">
+                        ${pathNames.map((name, index) => `
+                            <span class="px-2 py-1 rounded-lg bg-cyan-600/20 text-cyan-300 font-semibold border border-cyan-500/30 flex items-center space-x-1">
+                                <span>${name}</span>
+                            </span>
+                            ${index < pathNames.length - 1 ? '<i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>' : ''}
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // Calculate Graph Centrality & Metrics
+        function calculateMetrics() {
+            if (nodes.length === 0) {
+                document.getElementById('metric-max-degree').innerText = '-';
+                document.getElementById('metric-density').innerText = '-';
+                document.getElementById('metric-avg-path').innerText = '-';
+                return;
+            }
+
+            // 1. Max Degree Centrality
+            const degrees = {};
+            nodes.forEach(n => degrees[n.id] = 0);
+            edges.forEach(e => {
+                degrees[e.from] = (degrees[e.from] || 0) + 1;
+                if (!isDirected) {
+                    degrees[e.to] = (degrees[e.to] || 0) + 1;
+                }
+            });
+
+            let maxDegreeNode = null;
+            let maxDeg = -1;
+            Object.entries(degrees).forEach(([id, deg]) => {
+                if (deg > maxDeg) {
+                    maxDeg = deg;
+                    maxDegreeNode = nodes.find(n => n.id == id);
+                }
+            });
+
+            document.getElementById('metric-max-degree').innerText = maxDegreeNode ? `${maxDegreeNode.name} (${maxDeg})` : '0';
+
+            // 2. Density
+            const V = nodes.length;
+            const E = edges.length;
+            const maxPossibleEdges = isDirected ? V * (V - 1) : (V * (V - 1)) / 2;
+            const density = maxPossibleEdges > 0 ? (E / maxPossibleEdges).toFixed(2) : '0.00';
+            document.getElementById('metric-density').innerText = density;
+
+            // 3. Average Path Length (using Floyd-Warshall matrix)
+            const { dist } = runFloydWarshall();
+            let sumDist = 0;
+            let countPaths = 0;
+
+            nodes.forEach(u => {
+                nodes.forEach(v => {
+                    if (u.id !== v.id && dist[u.id][v.id] !== Infinity) {
+                        sumDist += dist[u.id][v.id];
+                        countPaths++;
+                    }
+                });
+            });
+
+            const avgPath = countPaths > 0 ? (sumDist / countPaths).toFixed(2) : '0';
+            document.getElementById('metric-avg-path').innerText = `${avgPath} masofa`;
+        }
+
+        // Modal for Floyd-Warshall Matrix
+        function openFloydMatrixModal() {
+            if (nodes.length === 0) {
+                alert("Grafda foydalanuvchilar yo'q!");
+                return;
+            }
+
+            const { dist } = runFloydWarshall();
+            const container = document.getElementById('matrix-container');
+
+            let html = `
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900 text-slate-300">
+                            <th class="p-2 border border-slate-800 font-bold">Foydalanuvchi</th>
+                            ${nodes.map(n => `<th class="p-2 border border-slate-800 text-center font-bold text-cyan-400">${n.name}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            nodes.forEach(u => {
+                html += `
+                    <tr class="hover:bg-slate-900/50">
+                        <td class="p-2 border border-slate-800 font-bold text-cyan-400 bg-slate-900/80">${u.name}</td>
+                        ${nodes.map(v => {
+                            const val = dist[u.id][v.id];
+                            const displayVal = val === Infinity ? '∞' : val;
+                            const bgStyle = u.id === v.id ? 'bg-slate-900/30 text-slate-400' : 'text-slate-200';
+                            return `<td class="p-2 border border-slate-800 text-center font-semibold ${bgStyle}">${displayVal}</td>`;
+                        }).join('')}
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+            document.getElementById('matrix-modal').classList.remove('hidden');
+        }
+
+        function closeFloydMatrixModal() {
+            document.getElementById('matrix-modal').classList.add('hidden');
+        }
     </script>
 </body>
 </html>
